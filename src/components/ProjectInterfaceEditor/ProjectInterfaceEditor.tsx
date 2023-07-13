@@ -43,9 +43,9 @@ function ProjectInterfaceEditor({
   onProposal,
 }: ProjectInterfaceEditorProps) {
   return (
-    <PanelGroup direction="vertical">
+    <PanelGroup direction="vertical" autoSaveId="lightrail-1">
       <Panel order={1}>
-        <PanelGroup direction="horizontal">
+        <PanelGroup direction="horizontal" autoSaveId="lightrail-2">
           {project && (
             <ComponentInfoPanel
               project={project}
