@@ -7,7 +7,6 @@ import {
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { editingComponent } from "../PreviewRenderer/preview-renderer-state";
-import { ReflexElement } from "react-reflex";
 import VariableToken from "../VariableToken/VariableToken";
 import ComponentQueryEditingModal from "../ComponentQueryEditingModal/ComponentQueryEditingModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,6 +17,7 @@ import UpdateComponentTreeModal from "../UpdateComponentTreeModal/UpdateComponen
 import StateModificationModal from "../StateModificationModal/StateModificationModal";
 import { type UpdateProposal } from "../UpdateProposalModal";
 import { getInitialStateValueString } from "@/util/util";
+import { Panel } from "react-resizable-panels";
 
 export interface ComponentInfoPanelProps {
   project: ProjectWithFiles;
@@ -82,8 +82,8 @@ function ComponentInfoPanel({
 
   const isOpen = !!editingComponentFile;
 
-  return (
-    <ReflexElement flex={isOpen ? 0.5 : 0}>
+  return isOpen ? (
+    <Panel minSize={10} defaultSize={12} order={1}>
       <div className="flex flex-col min-h-full bg-slate-50 text-slate-800 px-4 py-2">
         <div className="text-sm font-semibold">State</div>
         <div className="flex flex-row flex-wrap gap-2 my-2">
@@ -173,8 +173,8 @@ function ComponentInfoPanel({
           />
         )}
       </div>
-    </ReflexElement>
-  );
+    </Panel>
+  ) : null;
 }
 
 export default ComponentInfoPanel;

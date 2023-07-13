@@ -1,8 +1,5 @@
 import React from "react";
 import BrowserMockup from "../BrowserMockup/BrowserMockup";
-
-import { ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
-
 import ComponentEditorPanel from "../ComponentEditorPanel/ComponentEditorPanel";
 
 import classNames from "classnames";
@@ -13,6 +10,8 @@ import { ProjectWithFiles } from "@/util/storage";
 import { ComponentCreationCallback } from "../ProjectEditor/editor-types";
 import PreviewFrame from "../PreviewFrame/PreviewFrame";
 import { type UpdateProposal } from "../UpdateProposalModal";
+import { Panel, PanelGroup } from "react-resizable-panels";
+import PanelResizer from "@/PanelResizer/PanelResizer";
 
 export interface ProjectInterfaceEditorProps {
   project: ProjectWithFiles;
@@ -44,9 +43,9 @@ function ProjectInterfaceEditor({
   onProposal,
 }: ProjectInterfaceEditorProps) {
   return (
-    <ReflexContainer orientation="horizontal">
-      <ReflexElement flex={3}>
-        <ReflexContainer orientation="vertical">
+    <PanelGroup direction="vertical">
+      <Panel order={1}>
+        <PanelGroup direction="horizontal">
           {project && (
             <ComponentInfoPanel
               project={project}
@@ -55,12 +54,12 @@ function ProjectInterfaceEditor({
               onUpdateComponentTree={onUpdate}
             />
           )}
-          <ReflexSplitter />
-          <ReflexElement
+          <PanelResizer vertical />
+          <Panel
+            order={2}
             className={classNames("flex flex-row min-h-0", {
               "opacity-50": rendering,
             })}
-            flex={3}
           >
             {project?.type === "component" ? (
               <ComponentPreviewDressing>
@@ -84,8 +83,8 @@ function ProjectInterfaceEditor({
                 )}
               </BrowserMockup>
             )}
-          </ReflexElement>
-          <ReflexSplitter />
+          </Panel>
+          <PanelResizer vertical />
           {project && (
             <ComponentsListPanel
               project={project}
@@ -100,9 +99,9 @@ function ProjectInterfaceEditor({
               onComponentDeleted={onUpdate}
             />
           )}
-        </ReflexContainer>
-      </ReflexElement>
-      <ReflexSplitter />
+        </PanelGroup>
+      </Panel>
+      <PanelResizer />
       <ComponentEditorPanel
         project={project}
         onUpdate={onUpdate}
@@ -112,7 +111,7 @@ function ProjectInterfaceEditor({
           setOnComponentCreated(() => callback);
         }}
       />
-    </ReflexContainer>
+    </PanelGroup>
   );
 }
 

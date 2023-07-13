@@ -1,6 +1,5 @@
 import { ProjectWithFiles } from "@/util/storage";
 import React, { useMemo, useState } from "react";
-import { ReflexElement } from "react-reflex";
 import { editingComponent } from "../PreviewRenderer/preview-renderer-state";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import Button from "../Button/Button";
@@ -9,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../Modal/Modal";
 import { SERVER_URL } from "@/util/constants";
+import { Panel } from "react-resizable-panels";
 
 export interface ComponentsListPanelProps {
   isOpen: boolean;
@@ -49,8 +49,8 @@ function ComponentsListPanel({
     const json = await res.json();
   }
 
-  return (
-    <ReflexElement flex={isOpen ? 0.5 : 0}>
+  return isOpen ? (
+    <Panel minSize={10} defaultSize={12} order={3}>
       <div className="flex flex-col min-h-full bg-slate-50 text-slate-800 px-4 py-2">
         <div className="text-xl font-semibold">Components</div>
         <div className="space-y-2 my-4">
@@ -61,7 +61,7 @@ function ComponentsListPanel({
             + New component
           </Button>
           {orderedComponents.map((file) => (
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-row gap-2" key={file.path}>
               <button
                 className="text-red-500 hover:text-red-600 cursor-pointer hint--right hint--rounded"
                 aria-label="Delete component"
@@ -125,8 +125,8 @@ function ComponentsListPanel({
           </Button>,
         ]}
       />
-    </ReflexElement>
-  );
+    </Panel>
+  ) : null;
 }
 
 export default ComponentsListPanel;

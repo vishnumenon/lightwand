@@ -64,7 +64,7 @@
     "react-hot-toast": "^2.4.1",
     "react-hotkeys-hook": "^4.4.0",
     "react-modal-video": "^2.0.0",
-    "react-reflex": "^4.1.0",
+    "react-resizable-panels": "^0.0.53",
     "react-resize-detector": "^9.1.0",
     "react-tag-input": "^6.8.1",
     "react-tooltip": "^5.13.0",

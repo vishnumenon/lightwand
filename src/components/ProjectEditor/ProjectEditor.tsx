@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 import EditorNavbar from "../EditorNavbar/EditorNavbar";
 import toast, { Toaster } from "react-hot-toast";
 
-import "react-reflex/styles.css";
 import TourModal from "../TourModal/TourModal";
 import PreviewFrame from "../PreviewFrame/PreviewFrame";
 import ComponentCreationModal from "../ComponentCreationModal/ComponentCreationModal";
