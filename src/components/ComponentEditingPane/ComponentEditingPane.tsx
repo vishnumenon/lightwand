@@ -1,6 +1,6 @@
 import { SERVER_URL } from "@/util/constants";
-import { FileRevision, ProjectWithFiles } from "@/util/storage";
-import React, { useEffect, useState } from "react";
+import { FileRevision, FileUpdate, ProjectWithFiles } from "@/util/storage";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { editingComponent } from "../PreviewRenderer/preview-renderer-state";
 import classNames from "classnames";
@@ -17,6 +17,10 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { type UpdateProposal } from "../UpdateProposalModal";
 import ComponentNameEditor from "../ComponentNameEditor/ComponentNameEditor";
 import DiffView from "../DiffView/DiffView";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCode, faFileCode } from "@fortawesome/free-solid-svg-icons";
+import Modal from "../Modal/Modal";
+import ComponentFileEditor from "../ComponentFileEditor/ComponentFileEditor";
 
 export interface ComponentEditingPaneProps {
   project: ProjectWithFiles;
@@ -43,6 +47,7 @@ function ComponentEditingPane({
   const [selectedRevision, setSelectedRevision] = useState<FileRevision | null>(
     null
   );
+  const [componentFileModalOpen, setComponentFileModalOpen] = useState(false);
 
   useEffect(() => {
     setSelectedRevision(null);
@@ -69,6 +74,11 @@ function ComponentEditingPane({
     [loading, selectedRevision, modification, modifiedCode, oldCode]
   );
 
+  const currentFile = useMemo(
+    () => project.files.find((f) => f.path === editingComponentValue?.name),
+    [project, editingComponentValue?.name]
+  );
+
   useEffect(() => {
     if (editingComponentValue?.name) {
       const file = project.files.find(
@@ -80,7 +90,7 @@ function ComponentEditingPane({
     }
   }, [project, editingComponentValue?.name]);
 
-  async function updateComponent() {
+  async function updateComponent(fileUpdate?: FileUpdate) {
     setLoading(true);
 
     analytics.track("Component Update Requested", {
@@ -89,11 +99,13 @@ function ComponentEditingPane({
     });
 
     try {
-      if (selectedRevision || modifiedCode !== oldCode) {
+      if (fileUpdate || selectedRevision || modifiedCode !== oldCode) {
         // Update directly, without prompting LLM
-        const updateBody = selectedRevision
-          ? { revision: selectedRevision.id }
-          : { contents: modifiedCode };
+        const updateBody =
+          fileUpdate ||
+          (selectedRevision
+            ? { revision: selectedRevision.id }
+            : { contents: modifiedCode });
         const res = await fetch(
           `${SERVER_URL}/api/projects/${project.id}/files/${editingComponentValue?.name}`,
           {
@@ -248,6 +260,15 @@ function ComponentEditingPane({
             <TimerProgressBar duration={20} caption="Rewriting component..." />
           )}
         </div>
+        {!loading && (
+          <Button
+            onClick={() => setComponentFileModalOpen(true)}
+            className="text-xs py-1"
+            secondary
+          >
+            <FontAwesomeIcon icon={faFileCode} className="pr-2" /> Open File
+          </Button>
+        )}
         <button
           className="text-slate-500 hover:text-slate-600 text-2xl"
           onClick={() => setEditingComponentValue(null)}
@@ -321,7 +342,7 @@ function ComponentEditingPane({
               <>
                 <Button
                   className="flex-1 lg:w-full lg:flex-initial bg-green-600 text-white hover:bg-green-800 active:bg-green-500"
-                  onClick={updateComponent}
+                  onClick={() => updateComponent}
                   custom
                 >
                   <span className="font-normal flex flex-row flex-wrap justify-center gap-1">
@@ -354,7 +375,7 @@ function ComponentEditingPane({
               <>
                 <Button
                   className="flex-1 lg:w-full lg:flex-initial"
-                  onClick={updateComponent}
+                  onClick={() => updateComponent}
                   disabled={
                     loading || (modifiedCode === oldCode && !modification)
                   }
@@ -387,6 +408,12 @@ function ComponentEditingPane({
           </div>
         </div>
       </div>
+      <ComponentFileEditor
+        file={currentFile}
+        isOpen={componentFileModalOpen}
+        onClose={() => setComponentFileModalOpen(false)}
+        onUpdateFile={updateComponent}
+      />
     </div>
   );
 }

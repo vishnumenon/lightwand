@@ -9,6 +9,7 @@ export interface ModalProps {
   actions?: React.ReactNode;
   wide?: boolean;
   blackout?: boolean;
+  bg?: string;
 }
 
 function Modal({
@@ -19,6 +20,7 @@ function Modal({
   actions,
   wide,
   blackout,
+  bg,
 }: ModalProps) {
   return (
     <div
@@ -38,9 +40,13 @@ function Modal({
           "max-w-2xl": !wide,
         })}
       >
-        <div className="bg-white z-50 rounded-md p-2 shadow relative max-h-[90vh]   flex flex-col">
+        <div
+          className={`${
+            bg ?? "bg-white"
+          } z-50 rounded-md p-2 shadow relative max-h-[90vh] flex flex-col`}
+        >
           <div className="flex items-start justify-between p-4 rounded-t">
-            <h3 className="text-gray-900 text-xl lg:text-2xl font-semibold ">
+            <h3 className="text-gray-900 text-xl lg:text-2xl font-semibold flex-1 ">
               {title}
             </h3>
             {onClose && (

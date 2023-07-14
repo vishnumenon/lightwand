@@ -65,6 +65,10 @@ export function getUsedComponentNames(
   );
 }
 
+export function indent(code: string, by: string) {
+  return code.replaceAll(/^/gm, by);
+}
+
 export function formatComponentTree(
   code: string,
   wrapInFragment?: boolean
