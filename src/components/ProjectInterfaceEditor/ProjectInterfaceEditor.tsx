@@ -11,7 +11,7 @@ import { ComponentCreationCallback } from "../ProjectEditor/editor-types";
 import PreviewFrame from "../PreviewFrame/PreviewFrame";
 import { type UpdateProposal } from "../UpdateProposalModal";
 import { Panel, PanelGroup } from "react-resizable-panels";
-import PanelResizer from "@/PanelResizer/PanelResizer";
+import PanelResizer from "../PanelResizer/PanelResizer";
 
 export interface ProjectInterfaceEditorProps {
   project: ProjectWithFiles;

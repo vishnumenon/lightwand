@@ -8,7 +8,7 @@ import { File, FileStateItem, FileUpdate } from "@/util/storage";
 import { getInitialStateValueString, indent } from "@/util/util";
 import React, { useEffect, useMemo, useState } from "react";
 import CodeEditor from "../CodeEditor/CodeEditor";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { activeProject } from "../ProjectEditor/editor-state";
 import StateTextEditor from "../StateTextEditor/StateTextEditor";
 import { Json } from "@/supabase";
@@ -17,6 +17,10 @@ import Button from "../Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 import Loader from "../Loader/Loader";
+import ComponentsListPanel from "../ComponentsListPanel/ComponentsListPanel";
+import classNames from "classnames";
+import { editingComponent } from "../PreviewRenderer/preview-renderer-state";
+import { faFileCode } from "@fortawesome/free-regular-svg-icons";
 
 function ReadOnlyFragment({
   children,
@@ -77,6 +81,8 @@ function ComponentFileEditor({
   onUpdateFile,
 }: ComponentFileEditorProps) {
   const project = useRecoilValue(activeProject);
+  const setEditingComponent = useSetRecoilState(editingComponent);
+
   const [states, setStates] = useState<FileStateItem[]>(
     cleanStateForInput(file?.state)
   );
@@ -87,6 +93,7 @@ function ComponentFileEditor({
 
   useEffect(() => {
     setStates(cleanStateForInput(file?.state));
+    setComponentTree(file?.contents ?? "");
   }, [file]);
 
   const statesIsModified = useMemo(
@@ -107,6 +114,15 @@ function ComponentFileEditor({
     () => statesIsModified || componentTreeIsModified,
     [statesIsModified, componentTreeIsModified]
   );
+
+  const orderedComponents = useMemo(() => {
+    return project?.files.slice().sort((a, b) => {
+      if (a.path === "index") return -1;
+      if (b.path === "index") return 1;
+
+      return a.path.localeCompare(b.path);
+    });
+  }, [project?.files]);
 
   if (!file) {
     return null;
@@ -140,6 +156,31 @@ function ComponentFileEditor({
         </div>
       }
       bg="bg-slate-100"
+      sidebar={
+        <div className="border-r border-r-slate-300 p-2">
+          <div className="font-semibold pb-2">Components</div>
+          {orderedComponents?.map((c) => (
+            <div
+              className="flex flex-row gap-4 items-center px-2 py-1 hover:cursor-pointer hover:opacity-70"
+              key={c.path}
+            >
+              <FontAwesomeIcon icon={faFileCode} className="text-slate-500" />
+              <div
+                key={c.path}
+                className={classNames({
+                  "text-sky-500": c.path === file.path,
+                  "text-slate-500": c.path !== file.path,
+                })}
+                onClick={(e) => {
+                  setEditingComponent({ name: c.path });
+                }}
+              >
+                {c.path === "index" ? "index (root)" : c.path}
+              </div>
+            </div>
+          ))}
+        </div>
+      }
       content={
         <div className="text-[0.813rem] font-mono bg-slate-100 p-4">
           <ReadOnlyFragment>{getPrologueFragment(file)}</ReadOnlyFragment>
@@ -154,7 +195,7 @@ function ComponentFileEditor({
           </LabelledSection>
           <ReadOnlyFragment>
             {`  return (
-      <>`}
+    <>`}
           </ReadOnlyFragment>
           <LabelledSection label="Component Tree" className="pl-6">
             <CodeEditor

@@ -51,7 +51,7 @@ function StateTextEditor({ states, onChange }: StateTextEditorProps) {
           onChange([...states, { name: "", initial: "" }]);
         }}
       >
-        const [ ..., set... ] = React.useState( ...){" "}
+        const [..., set...] = React.useState(...){" "}
         <span className="text-gray-400 pl-2">
           {"// Click to Add State Item"}
         </span>
